@@ -1,2 +1,2 @@
 # ProjetoAnaliseCyclistic
-Este repositório serve para armazenar os arquivos bases e de código em R para realizar a análise de conclusão do curso de Data Analytics da Google
+Este repositório serve para armazenar os arquivos bases e de código em R utilizadores durante o case técnico exigido para concluir o curso de Data Analytics da Google.
