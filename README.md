@@ -42,15 +42,14 @@ As bases de dados fornecidas se encontram em pastas zips e separadas mês a mês
 
 ## 💻 Tecnologia utilizadas
 - Linguagem  R 
-
-- Mega pacote Tidyverse
-  - Pacote dply
-  - Pacote ggplot2
-  - Pacote tidyr 
-  - Pacote purrr
-  - Pacote lubridate
-  - Pacote knitr 
-Pacote Summarytools
+  - Mega pacote Tidyverse
+    - Pacote dply
+    - Pacote ggplot2
+    - Pacote tidyr 
+    - Pacote purrr
+    - Pacote lubridate
+    - Pacote knitr 
+  - Pacote Summarytools
 
 ## 🔐 Licença
 Este arquivo faz parte do projeto Projeto-Analise-Cyclistic
