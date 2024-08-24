@@ -13,7 +13,6 @@ O objetivo é realizar uma análise de dados através de análise exploratória 
 As bases de dados fornecidas se encontram em pastas zips e separadas mês a mês. Para está análise, precisam garantir o pilar de Atualidade, por isso, iremos utilizar os arquivos mais recentes (2023-05 a 2024-06) para a data da análise (2024-07 2024-08)
 
 ## ⚙️ Demandas
-- Demandas: 
 - Download e descompactação dos arquivos do Docker
 - Processar os arquivos dos últimos 12M
 - Realizar a limpeza
