@@ -39,7 +39,7 @@ As bases de dados fornecidas se encontram em pastas zips e separadas mês a mês
 | duration_trip | Diferença do horário de início da viagem e horário de término | Num | Criada |
 | day_for_week | Dia de início de cada viagem | Num | Criada |
 
-## 💻 Tecnologia utilizadas
+## 💻 Tecnologias utilizadas
 - Linguagem  R 
   - Mega pacote Tidyverse
     - Pacote dply
