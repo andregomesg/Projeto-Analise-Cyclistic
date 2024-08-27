@@ -1,6 +1,6 @@
 # 🔍 Análise sobre o padrão de utilização dos clientes do sistema de compartilhamento de bicicletas 🔎
 ## Sobre 
-Este projeto utiliza arquivos referente a utilização do serviço de bicicletas compartilháveis em Chicago, NY. Foram disponibilizados através de um [Docker](https://divvy-tripdata.s3.amazonaws.com/index.html) pela empresa Divvy, operada pela Motivate Internation Inc, uma entidade reconhecida e respeitada no setor de compartilhamento de bicicletas. 
+Este projeto utiliza base de dados referentes a utilização do serviço de bicicletas compartilháveis de Chicago, NY. As bases foram disponibilizados através de um [Docker](https://divvy-tripdata.s3.amazonaws.com/index.html) pela empresa Divvy, operada pela Motivate Internation Inc, uma entidade reconhecida e respeitada no setor de compartilhamento de bicicletas. 
 
 ## 🤯 Contexto do problema
 O objetivo é realizar uma análise de dados através de análise exploratória e descritiva para encontrar padrões buscando responder 3 perguntas levantadas pela Lily Moreno e sua equipe de marketing: 
@@ -10,7 +10,7 @@ O objetivo é realizar uma análise de dados através de análise exploratória 
 3. Como a Cyclistic pode usar a mídia digital para influenciar os passageiros casuais  a se tornarem membros cyclistic?
 
 ## 📝 Compreensão dos dados
-As bases de dados fornecidas se encontram em pastas zips e separadas mês a mês. Para está análise, precisam garantir o pilar de Atualidade, por isso, iremos utilizar os arquivos mais recentes (2023-05 a 2024-06) para a data da análise (2024-07 2024-08)
+As bases de dados fornecidas se encontram em pastas zips e separadas mês a mês. Para está análise, precisam garantir o pilar de Atualidade, por isso, iremos utilizar os arquivos mais recentes (2023-05 a 2024-06) para a data da análise (2024-07 a 2024-08)
 
 ## ⚙️ Demandas
 - Download e descompactação dos arquivos do Docker
