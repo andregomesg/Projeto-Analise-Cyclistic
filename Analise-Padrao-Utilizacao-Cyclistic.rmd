@@ -1,0 +1,296 @@
+---
+title: 'Análise do padrão de utilização do serviço de compartilhamento de bicicletas'
+author: "André Christian F G Almeida"
+date: "2024-08-20"
+output:
+html_document: default
+ 
+---
+
+Nos foi apresentado a Cyclistic, uma empresa de mobilidade com foco na sustentabilidade e compartilhamento de bicicletas de diversos tipos como: reclináveis, triciclos manuais e de carga. Hoje, ela conta com mais de 5.800 unidades e cerca de 692 estações de compartilhamento em Chicago.
+
+## Identificação da tarefa de negócios, desafios e principais stakeholders.
+
+Hoje a Cyclistic tem um desafio: Aumentar a taxa de conversão de **membros casuais** (aqueles que assinam os planos diários e mensais) em **membros Cyclistic** (aqueles que assinam planos anuais). Através dos dados podemos realizar análises exploratórias e descritivas para descobrir o padrão de utilização dos membros, como: horas utilizadas, trajeto efetuado, quantidade de uso em determinado período etc.
+
+**Principais tarefas**
+
+- Baixar os dados de utilização de todos os clientes dos últimos 12 meses
+- Realizar a estruturação dos dados
+- Realizar a limpeza dos dados
+- Realizar a análise exploratória dos dados
+- Realizar a análise descritiva dos dados
+- Apresentar para os stakeholders
+
+**Stakeholders e seu objetivo**
+
+A Lily Moreno, diretora de Marketing e responsável pelas campanhas de e-mail, mídias e outros canais juntamente com a sua equipe de marketing desejam descobrir tendências através dos dados históricos.
+
+**Conclusão**
+
+Ao analisar os dados fornecidos e gerar insights, podemos auxiliar o setor de Marketing a criar campanhas estratégicas, a fim de converter os clientes casuais em membros Cyclistic respondendo as seguintes perguntas:
+
+1.  Como os membros Cyclistic e ciclistas casuais usam as bicicletas da Cyclistic de forma diferente?
+2.  Por que os ciclistas casuais iriam querer adquirir planos anuais da Cyclistic?
+3.  Como a Cyclistic pode usar a mídia digital para influenciar os passageiros casuais a se tornarem membros cyclistic?
+
+```         
+💡 Com esta entrega, finalizamos a primeira etapa de um processo de análise de dados: Perguntar
+```
+
+### Preparação e Armazenamento dos Dados
+
+Os dados da Cyclistic (nome fítcio para compartilhar os dados) foram fornecidos através de um [link](https://divvy-tripdata.s3.amazonaws.com/index.html) sob uma [licença](https://www.divvybikes.com/data-license-agreement) pela Divvy, empresa operada pela Motivate International Inc., uma entidade reconhecida e respeitada no setor de compartilhamento de bicicletas.
+
+Coletados de forma automática pelos sistema de compartilhamento, os dados sugerem uma coleta consistente e precisa, no entanto, foram identificados valores nulos, que serão tratados e validados.
+
+Embora os dados abrangem um período extenso (desde 2015), iremos focar na atualidade e analisar somente os últimos 12 meses, garantindo uma análise baseada em informações recentes e relevantes. Por se tratar de uma análise anônima, não há preocupações com viés de relato/relatório, no entanto, vale ressaltar que é possível termos vieses na coleta, como o impacto de eventos sazonais ou alterações no serviço.
+
+Levando em consideração os pontos cruciais citados, como: Precisão, Atualidade, Objetividade, Viés, Integridade e Licenciamento, podemos garantir que os dados utilizados serão confiáveis e apropriados para análise. Fortalecendo a confiabilidade das conclusões tiradas.
+
+**Etapas de processamento** 
+
+1. Download dos arquivos 
+2. Extração de cada um das respectivas pastas zips
+3. Junção dos arquivos csv’s extraídos na pasta local “ProjetoAnaliseCyclistic”
+4. Criação o dataframe com todos os arquivos
+
+```{r Carregamento das bibliotecas, include=FALSE}
+# Carregamento das bibliotecas
+  library(summarytools)
+  library(tidyverse)
+  library(lubridate)
+  library(knitr)
+```
+
+```{r Definição do diretório dos arquivos}
+# Definição do diretório dos arquivos
+diretorio <- "C:/Users/André/Documents/ProjetoBike/ProjetoAnaliseCyclistic"
+```
+
+```{r Leitura de cada arquivo csv}
+# Leitura de cada arquivo csv
+arquivos <- list.files(diretorio, pattern = "*.csv", full.names = TRUE)
+```
+
+```{r Listagem dos arquivos existentes na pasta}
+# Listagem dos arquivos existentes na pasta
+  leitura_arq <- function(file){
+  read.csv(file)
+  }
+```
+
+```{r Criação do dataframe com os arquivos existentes}
+# Criação do dataframe com os arquivos existentes
+ df_historico <- map_df(arquivos, leitura_arq)
+```
+
+```{r}
+# Visualização das variáveis e seus tipos
+str(df_historico)
+```
+
+
+```         
+💡 Com esta entrega, finalizamos a segunda etapa de um processo de análise de dados: Preparar para exploração
+```
+
+### Processamento dos dados
+
+Para esta etapa temos que: 
+* Verificar se há valores nulos 
+* Verificar se há valores duplicados 
+* Conversão das colunas started_at e ended_at de texto para data 
+* Criaçao das coluna duration_trip, que mostra a duração de cada viagem 
+* Criação da coluna day_of_the_week, que mostra que dia da semana cada viagem começou
+
+```{r Sumário estátistico do data frame}
+# Sumário estátistico do data frame
+df_summary <- dfSummary(df_historico)
+  print(df_summary)
+```
+
+Identificamos que existem valores ride_id duplicados e colunas com valores em branco. Não iremos preencher as colunas com valores estatísticos pois a quantidade de registro é baixa, dessa forma, iremos excluir as linhas com valores nulos/vázios.
+
+```{r Remove as linhas duplicadas com base na coluna ride_id}
+# Remove as linhas duplicadas com base na coluna ride_id
+  df_historico_limpo <- df_historico %>%
+    distinct(ride_id, .keep_all = TRUE)
+```
+
+```{r Verificação se ainda há linhas duplicadas}
+# Verificação se ainda há linhas duplicadas
+existe_duplicadas <- df_historico_limpo %>%
+  filter(duplicated(ride_id) | duplicated(ride_id, fromLast = TRUE)) %>%
+  nrow() > 0
+print(existe_duplicadas)
+```
+
+```{r Verificação se há pelo menos um valor nulo ou vazio em cada linha}
+# Verificação se há pelo menos um valor nulo ou vazio em cada linha
+verifica_vazio_ou_nulo <- function(x) {
+  if (is.character(x)) {
+    return(is.na(x) | x == "")
+  } else {
+    return(is.na(x))
+  }
+}
+```
+
+```{r Aplicar a função para cada linha do dataframe}
+# Aplicar a função para cada linha do dataframe
+linha_com_problemas <- apply(df_historico_limpo, 1, function(row) any(verifica_vazio_ou_nulo(row)))
+```
+
+```{r Filtrar o dataframe para remover as linhas com erros e manter o dataframe original}
+# Filtrar o dataframe para remover as linhas com erros e manter o dataframe original
+df_historico_limpo <- df_historico_limpo[!linha_com_problemas, ]
+```
+
+```{r Exibição da quantidade de linhas antes e depois da limpeza}
+# Exibição da quantidade de linhas antes e depois da limpeza
+numero_de_linhas_antes <- nrow(df_historico)
+ numero_de_linhas_depois <- nrow(df_historico_limpo)
+
+  print(paste("Número de linhas antes da limpeza: ", numero_de_linhas_antes))
+  print(paste("Número de linhas depois da limpeza: ", numero_de_linhas_depois))
+
+```
+
+```{r Adissão da coluna "duration_trip" ao dataframe}
+# Adissão da coluna "duration_trip" ao dataframe
+# conversão da colunas started_at e ended_at para "difftime"
+  df_historico_limpo$started_at <- ymd_hms(df_historico_limpo$started_at)
+  df_historico_limpo$ended_at <- ymd_hms(df_historico_limpo$ended_at)
+# Calculo da duração e conversão para minutos arrendondados para cima
+  df_historico_limpo <- df_historico_limpo %>% 
+    mutate(duration_trip = ceiling(difftime(ended_at, started_at, units = "mins"))) #em minutos
+```
+
+```{r Criação da coluna day_of_the_week}
+# Criação da coluna day_of_the_week
+ df_historico_limpo <- df_historico_limpo %>%
+    mutate(day_of_the_week = wday(started_at, label = TRUE))
+```
+
+```         
+Com esta entrega, finalizamos a terceira etapa de um processo de análise de dados: Processar
+```
+
+### Análise Exploratória e Descritiva do Dataframe
+
+```{r Criação de um novo sumário com os dados limpos}
+# Criação de um novo sumário com os dados limpos
+df_summary <- dfSummary(df_historico_limpo)
+  print(df_summary)
+```
+
+#### Análise exploratória
+
+```         
+💡 O tipo de bicicleta com menor frequência de uso são as docked_bike (bicicletas cargueiras), com 1.2% dos registros e as classic_bike(bicicletas comuns) dominam, com 65.0% dos registros
+```
+
+```         
+ De 5272212 registros, 36% são de membros casuais e 64% de membros Cyclistic
+```
+
+```         
+ A duração média de uma viagem é de 11 minutos
+```
+
+```{r O dia em que os clientes mais utilizam o serviço}
+
+freq_day_of_the_week <- table(df_historico_limpo$day_of_the_week)
+moda <- names(freq_day_of_the_week)[which.max(freq_day_of_the_week)]
+print(paste("O dia da semana em que os clientes mais utilizam o serviço é no(a)", moda ))
+```
+
+```{r O tipo de bicicleta que mais utilizam}
+
+freq_rideable_type <- table(df_historico_limpo$rideable_type)
+moda <- names(freq_rideable_type[which.max(freq_rideable_type)])
+print(paste("O tipo de bicicleta que os clientes mais utilizam são as ", moda))
+```
+
+#### Análise descritiva
+
+```{r Comparação da quantidade de viagem segundo o tipo de bicicleta segmentado por tipo de membro}
+title_text <- str_wrap("Quantidade de viagens por tipo de bicicleta e membro")
+subtitle_text <- str_wrap("Ambos os membros utilizam os modelos de bicicleta de forma parecida, sendo a clássica a principal escolha.")
+  ggplot(data = df_historico_limpo) + 
+    geom_bar(mapping = aes(x = rideable_type, fill = rideable_type)) + 
+    facet_wrap(~member_casual) +
+    labs(title = title_text,
+       subtitle = subtitle_text, 
+       y = "Quantidade de viagens", 
+       x = "Tipos de bicicleta",
+       fill = "Tipos de bicicleta") +
+   scale_y_continuous(labels = scales::comma_format()) # separação de milhares
+```
+
+```{r Comparação da quantidade de viagem por dia da semana segmentado por tipo de membro}
+title_text <- str_wrap("Quantidade de viagens durante a semana por tipo de membro")
+subtitle_text <- str_wrap("Os membros Cyclistic costumam utilizar as bicicletas durante a semana, enquanto os membros casuais tendem a utilizar o serviço aos finais de semana")
+  ggplot(data = df_historico_limpo) + 
+  geom_bar(mapping = aes(x = day_of_the_week, fill = day_of_the_week)) + 
+  facet_wrap(~member_casual) +
+  labs(title = title_text,
+       subtitle = subtitle_text,
+       y = "Quantidade de viagens",
+       x = "Dias da semana",
+       fill = "Dias da semana") +
+  scale_y_continuous(labels = scales::comma_format()) # separação de milhares
+```
+
+```{r Duração média de viagens segundo os dias da semana segmentado por tipo de membro}
+title_text <- str_wrap("Duração média de viagens por dia da semana e tipo de membro")
+    subtitle_text <- str_wrap("O tempo médio de viagem dos membros casuais segue o padrão esperado, com viagens mais longas nos finais de semana. Enquanto os membros Cyclistic também apresentam um comportamento semelhante.") 
+df_historico_limpo %>%
+ mutate(duration_trip_min = as.numeric(duration_trip, units = "mins")) %>%
+ group_by(day_of_the_week, member_casual) %>%
+    summarize(mean_duration_trip = mean(duration_trip_min), .groups = 'drop') %>%
+    ggplot(aes(x = day_of_the_week, y = mean_duration_trip, fill = day_of_the_week)) + 
+    geom_bar(stat = "identity") + 
+    facet_wrap(~member_casual) +
+labs(title = title_text,
+     subtitle = subtitle_text, 
+     y = "Duração média das viagens",
+     x = "Dias da semana",
+     fill = "Dias da semana")
+
+```
+
+### Resumo da análise
+
+Analisando a utilização dos membros da Cyclistic do último ano (2023/05 - 2024-06) podemos concluir que:
+
+-   Os membros **Cyclistic** utilizam mais o serviço se comparado aos membros **casuais**
+-   Ambos os perfis de membros preferem utilizar as bicicletas **clássicas** a **bicicletas elétricas**.
+-   O dia mais comum de utilização do serviço são aos **sábados**, o tipo de bicicleta mais utilizado é a **bicicleta clássica**, e a viagens tem uma **média 11 minutos** de duração.
+-   **Membros casuais** costumam utilizar o serviço durante os finais de semana, dias normalmente relacionados com a prática de lazer.
+-   **Membros Cyclistic** tem registro de viagens maiores no meio da semana (terça a quinta), dias que podem ter uma maior demanda de idas aos escritórios diante do contexto global de modalidades de locais de trabalho. No entanto, a média de duração das viagens se destaca aos finais de semana, apontando que além de utilizá-las para trabalho, também utilizam para uma possível recreação.
+
+
+```
+💡 Com esta entrega, finalizamos a quinta etapa de um processo de análise de dados: Compartilhar
+``` 
+
+### Recomendações com base na análise
+Recomendações para orientar as futuras campanhas de marketing com base na análise:
+
+1. Realização de pesquisa com os membros para entender quais são as principais empresas e instituição dos utilizadores do serviço para buscar parcerias corporativas ou descontos.
+2. Captar mais dados a respeito dos membros para expandir o conhecimento, podendo ser possível traçar os diferentes tipos de persona. 
+3. Criação de campanhas para converter os membros casuais em membros Cyclistic através de benefícios e rede de acesso.
+
+### Recomendações de melhorias 
+
+-   Configuração de uma API para conectar diretamente ao Docker disponibilizado para realizar o download automático sempre que estiver disponível.
+-   Estudar as possibilidades e necessidades de cruzar os dados de longitude e latitude de cada estação de início e fim para conseguir calcular a distância percorrida em cada viagem.
+
+```
+💡 Com esta entrega, finalizamos a sexta e última etapa de um processo de análise de dados: Agir
+``` 
+## Metodologia
+
+Decidimos utilizar a ferramenta R para realizar a análise para a equipe de marketing pela alta facilidade em realizar todo o processo de ETL. Precisamos instalar e configurar o ambiente R localmente para utilizar o terminal a partir do RStudio local, pois a limitação de hardware nas ferramentas onlines, como: Rstudio e GoogleColab, impossibilitou a utilização.
